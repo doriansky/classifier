@@ -29,27 +29,19 @@ class Model:
 
         batched_data = np.array_split(X,num_batches,axis=1)
         batched_labels = np.array_split(Y,num_batches,axis=1)
-        assert(len(batched_data) == len(batched_labels))
-        num_batches = len(batched_data)
+        assert (len(batched_data) == len(batched_labels))
+        assert (len(batched_data)==num_batches)
         
-        tau = 1000
-        targetLearningRate = 0.1*learning_rate
-
         for i in range(0,num_iterations):
-            if (i<tau):
-                newLearningRate  = (1-i/tau)*learning_rate + (i/tau)*targetLearningRate
-            else:
-                newLearningRate  = targetLearningRate
-
-            for batchIdx in range(0,num_batches):
-              
+                            
+            for batchIdx in range(0,num_batches):              
                 currBatch = batched_data[batchIdx]
                 currLabels = batched_labels[batchIdx]
                 assert(currBatch.shape[1] == currLabels.shape[1])
                 AL, caches = NeuralNet.forwardPropagation(currBatch,parameters)
                 cost = NeuralNet.computeCost(AL,currLabels,parameters,self.numberOfLayers, regularization_factor)
                 grads = NeuralNet.backwardPropagation(AL,currLabels,caches,regularization_factor)
-                parameters = NeuralNet.updateParameters(parameters,grads,newLearningRate)
+                parameters = NeuralNet.updateParameters(parameters,grads,learning_rate)
 
             if (print_cost and i%100==0):
                 print("Cost after iteration %i: %f" %(i,cost))

@@ -42,7 +42,7 @@ layer_dims=(n_x,50,n_h,n_y)
 
 
 model = Classifier.Model(layer_dims,initMode="xavier")
-model.train2(train_data, train_labels,num_iterations=2000,num_batches=5,learning_rate=0.02,regularization_factor=0.2,print_cost=True)
+model.train2(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,print_cost=True)
 model.predict(test_data,test_labels)
 
 model2 = Classifier.Model(layer_dims,initMode="xavier")
