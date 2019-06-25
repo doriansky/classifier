@@ -6,12 +6,14 @@ TODO list:
     0b. Implement "early stopping"
 
 1. Evaluate the model during training on a cross validation data set
+
 2. Extend the regularization options : allow L1,L2 and dropout regularization
+
 3. Properly document "train" : use mini-batch gradient descent with default num-batches=1 (aka batch gradient descent)
     3a. decay the learning rate during mini-BGD : see Goodfellow page 295 eq. 8.14
-4. Extend the optimization options: SGD, Momentum, NesterovMomentum, AdaGrad,Adadelta, RMSprop, Adam, Adamax, Nadam, AMSGrad
-For momentum, see Goodfellow pg 296
 
+4. Extend the optimization options: Momentum, NesterovMomentum, AdaGrad,Adadelta, RMSprop, Adam, Adamax, Nadam, AMSGrad
+For momentum, see Goodfellow pg 296
 
 5. Unit tests 
 
@@ -40,10 +42,17 @@ n_h = 20 #size of the hidden layer
 n_y = 1
 layer_dims=(n_x,50,n_h,n_y)
 
+#Nesterov momentum
+model3 = Classifier.Model(layer_dims,initMode="xavier")
+model3.train3(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,print_cost=True)
+model3.predict(test_data,test_labels)
+
+#Classical momentum
 model = Classifier.Model(layer_dims,initMode="xavier")
-model.train2(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,print_cost=True)
+model.train2(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,print_cost=True)
 model.predict(test_data,test_labels)
 
+#No momentum :(
 model2 = Classifier.Model(layer_dims,initMode="xavier")
 model2.train(train_data, train_labels,num_iterations=1000,learning_rate=0.0075,regularization_factor=0.2,print_cost=True)
 model2.predict(test_data,test_labels)
