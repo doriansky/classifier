@@ -66,9 +66,7 @@ class Model:
                 grads = NeuralNet.backwardPropagation(AL,currLabels,caches,regularization_factor)
 
                 # Update parameters                
-                self.velocities = NeuralNet.updateVelocities(self.velocities,0,learning_rate,grads)
-                parameters = NeuralNet.updateParametersWithMomentum(parameters, self.velocities)
-                #parameters = NeuralNet.updateParameters(parameters,grads,learning_rate)
+                self.velocities, parameters = NeuralNet.updateParametersWithMomentum(parameters, grads, learning_rate, self.velocities,0)               
 
             if (print_cost and i%100==0):
                 print("Cost after iteration %i: %f" %(i,cost))

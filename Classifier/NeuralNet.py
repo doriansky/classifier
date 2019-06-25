@@ -235,21 +235,39 @@ def updateParameters(parameters, grads, learning_rate):
 
     return parameters
 
-def updateVelocities(currentVelocities, momentumParameter, learning_rate, grads):
 
-    L = len(currentVelocities)//2
-    velocities={}
-    for l in range(L):
-        velocities["v_W"+str(l+1)] = momentumParameter*currentVelocities["v_W"+str(l+1)]-learning_rate*grads["dW"+str(l+1)]
-        velocities["v_b"+str(l+1)] = momentumParameter*currentVelocities["v_b"+str(l+1)]-learning_rate*grads["db"+str(l+1)]
-
-    return velocities
-
-def updateParametersWithMomentum(parameters, velocities):
+def updateParametersWithMomentum(parameters, grads, learningRate, velocities, momentum):
+    """
+    Update parameters using gradient descent with momentum. 
+    The update of params is smoothed out by considering the past gradients . 
+    The exponential weighted average(of past gradients) is computed and used as gradient during the update
     
-    L = len(parameters)//2
+    Arguments:
+    parameters -- python dictionary containing the parameters 
+    grads -- python dictionary containing the gradients, output of L_model_backward
+    learningRate -- the learning rate 
+    velocities -- current velocities
+    moementum -- momentum term. Setting this to zero will result in applying the standard update rule
 
+    Returns:
+    parameters -- python dictionary containing the updated parameters 
+                  parameters["W" + str(l)] = ... 
+                  parameters["b" + str(l)] = ...
+
+    velocities -- python dictionary containing the updated velocities (to be used at the next iteration)
+                    velocities["v_W"+str(l)] = ....
+                    velocities["v_b"+str(l)] = ....
+    """
+
+    L = len(parameters)//2
+    #First update the velocities    
+    for l in range(L):
+        velocities["v_W"+str(l+1)] = momentum*velocities["v_W"+str(l+1)]-learningRate*grads["dW"+str(l+1)]
+        velocities["v_b"+str(l+1)] = momentum*velocities["v_b"+str(l+1)]-learningRate*grads["db"+str(l+1)]
+
+    #Now apply the update rule
     for l in range(L):
         parameters["W" + str(l+1)] = parameters["W" + str(l+1)]+velocities["v_W"+str(l+1)]
         parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["v_b"+str(l+1)]
-    return parameters
+
+    return velocities,parameters
