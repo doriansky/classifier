@@ -14,14 +14,29 @@ import numpy as np
 import NeuralNet
 import matplotlib.pyplot as plt
 
+
 class Model:
 
     def __init__(self,layer_dims,initMode):
         self.params = NeuralNet.initializeParameters(layer_dims,initMode)
+        self.velocities = NeuralNet.initializeVelocities(layer_dims)
         self.numberOfLayers = len(layer_dims)-1
     
 
-    def train2(self,X,Y,num_iterations=3000,num_batches=1,learning_rate = 0.0075, regularization_factor=0.0,print_cost=False):
+    def train2(self,X,Y,num_iterations,num_batches=1,learning_rate = 0.0075, regularization_factor=0.0,print_cost=False):
+        """
+        Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
+        
+    
+        Arguments:
+        X -- data, numpy array of shape (number of examples, num_px * num_px * 3)
+        Y -- true "label" vector of shape (1, number of examples)        
+        num_iterations -- number of iterations of the optimization loop
+        num_batches -- number of batches to be used by gradient descent
+        learning_rate -- learning rate of the gradient descent update rule        
+        regularization_factor -- regularization factor used in L2 regularization
+        print_cost -- if True, it prints the cost every 100 steps        
+        """
         np.random.seed(1)
         costs=[]
         m = X.shape[1]
@@ -31,17 +46,29 @@ class Model:
         batched_labels = np.array_split(Y,num_batches,axis=1)
         assert (len(batched_data) == len(batched_labels))
         assert (len(batched_data)==num_batches)
-        
+      
+        # Gradient descent main loop
         for i in range(0,num_iterations):
                             
+            #Loop batches
             for batchIdx in range(0,num_batches):              
                 currBatch = batched_data[batchIdx]
                 currLabels = batched_labels[batchIdx]
                 assert(currBatch.shape[1] == currLabels.shape[1])
+
+                # Forward propagation: (L-1) ReLU units + 1 Sigmoid unit
                 AL, caches = NeuralNet.forwardPropagation(currBatch,parameters)
+
+                # Compute cost
                 cost = NeuralNet.computeCost(AL,currLabels,parameters,self.numberOfLayers, regularization_factor)
+
+                # Backward propagation
                 grads = NeuralNet.backwardPropagation(AL,currLabels,caches,regularization_factor)
-                parameters = NeuralNet.updateParameters(parameters,grads,learning_rate)
+
+                # Update parameters                
+                self.velocities = NeuralNet.updateVelocities(self.velocities,0,learning_rate,grads)
+                parameters = NeuralNet.updateParametersWithMomentum(parameters, self.velocities)
+                #parameters = NeuralNet.updateParameters(parameters,grads,learning_rate)
 
             if (print_cost and i%100==0):
                 print("Cost after iteration %i: %f" %(i,cost))

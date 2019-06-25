@@ -13,7 +13,7 @@ TODO list:
 For momentum, see Goodfellow pg 296
 
 
-
+5. Unit tests 
 
 DONE
 1. extend the Neural network; allow Xavier initialization of the parameters
@@ -39,7 +39,6 @@ n_x = train_data.shape[0]
 n_h = 20 #size of the hidden layer
 n_y = 1
 layer_dims=(n_x,50,n_h,n_y)
-
 
 model = Classifier.Model(layer_dims,initMode="xavier")
 model.train2(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,print_cost=True)

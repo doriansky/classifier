@@ -41,6 +41,16 @@ def initializeParameters(layer_dims,initMode):
 
     return parameters        
 
+def initializeVelocities(layer_dims):
+    np.random.seed(1)
+    velocities = {}
+    L = len(layer_dims)
+    for l in range(1,L):
+        velocities['v_W'+str(l)] = np.zeros(shape=(layer_dims[l], layer_dims[l-1]))
+        velocities['v_b'+str(l)] = np.zeros(shape=(layer_dims[l], 1))
+    return velocities
+
+
 def computeLinearActivations(A,W,b):
     """
     Implementation of the linear part of forward propagation
@@ -203,6 +213,7 @@ def backwardPropagation(AL,Y,caches, regularization_factor=0.0):
     
     return grads
 
+
 def updateParameters(parameters, grads, learning_rate):
     """
     Update parameters using gradient descent    
@@ -217,9 +228,28 @@ def updateParameters(parameters, grads, learning_rate):
     """
     
     L = len(parameters) // 2 # number of layers in the neural network
-
+   
     for l in range(L):
         parameters["W" + str(l+1)] = parameters["W" + str(l+1)]-learning_rate*grads["dW" + str(l+1)]
         parameters["b" + str(l+1)] = parameters["b" + str(l+1)]-learning_rate*grads["db" + str(l+1)]
 
+    return parameters
+
+def updateVelocities(currentVelocities, momentumParameter, learning_rate, grads):
+
+    L = len(currentVelocities)//2
+    velocities={}
+    for l in range(L):
+        velocities["v_W"+str(l+1)] = momentumParameter*currentVelocities["v_W"+str(l+1)]-learning_rate*grads["dW"+str(l+1)]
+        velocities["v_b"+str(l+1)] = momentumParameter*currentVelocities["v_b"+str(l+1)]-learning_rate*grads["db"+str(l+1)]
+
+    return velocities
+
+def updateParametersWithMomentum(parameters, velocities):
+    
+    L = len(parameters)//2
+
+    for l in range(L):
+        parameters["W" + str(l+1)] = parameters["W" + str(l+1)]+velocities["v_W"+str(l+1)]
+        parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["v_b"+str(l+1)]
     return parameters
