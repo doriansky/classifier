@@ -22,6 +22,7 @@ class Model:
         self.velocities = NeuralNet.initializeVelocities(layer_dims)
         self.numberOfLayers = len(layer_dims)-1
     
+    #gradient descent with Nesterov momentum
     def train3(self,X,Y,num_iterations,num_batches=1,learning_rate = 0.0075, regularization_factor=0.0,momentum = 0.0, print_cost=False):
         """
         Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
@@ -54,14 +55,17 @@ class Model:
                 currBatch = batched_data[batchIdx]
                 currLabels = batched_labels[batchIdx]
                 assert(currBatch.shape[1] == currLabels.shape[1])
-
-                #Nesterov :  apply the velocity to the params and compute the gradient using these ones instead
+                
+                # Nesterov Momentum -  Compute the gradients using tempParams = params + m*velocity
+                # https://dominikschmidt.xyz/nesterov-momentum/
+                # https://medium.com/konvergen/momentum-method-and-nesterov-accelerated-gradient-487ba776c987
                 L = len(parameters)//2
                 tempParams ={}
                 for l in range(L):
+                    # Goodfellow eq. 8.21 pg 300
                     tempParams["W"+str(l+1)] = parameters["W"+str(l+1)] + momentum*self.velocities["v_W"+str(l+1)]
                     tempParams["b"+str(l+1)] = parameters["b"+str(l+1)] + momentum*self.velocities["v_b"+str(l+1)]
-
+                
                 # Forward propagation: (L-1) ReLU units + 1 Sigmoid unit             
                 AL, caches = NeuralNet.forwardPropagation(currBatch,tempParams)
 
@@ -85,6 +89,7 @@ class Model:
         plt.show()
         self.params = parameters     
 
+    #gradient descent with momentum
     def train2(self,X,Y,num_iterations,num_batches=1,learning_rate = 0.0075, regularization_factor=0.0,momentum = 0.0, print_cost=False):
         """
         Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.
@@ -141,7 +146,7 @@ class Model:
         plt.show()
         self.params = parameters            
 
-
+    #standard mini-batch gradient descent
     def train(self,X, Y, num_iterations = 3000,  learning_rate = 0.0075, regularization_factor = 0.0, print_cost=False):
         """
         Implements a L-layer neural network: [LINEAR->RELU]*(L-1)->LINEAR->SIGMOID.

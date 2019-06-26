@@ -42,6 +42,14 @@ def initializeParameters(layer_dims,initMode):
     return parameters        
 
 def initializeVelocities(layer_dims):
+    """
+    Arguments:
+    layer_dims -- python array(list) containing the dimensions of each layer    
+    Returns:
+    velocities -- python dict containing the zero-initialized velocities "v_W1","v_b1",...."v_WL","v_bL":
+        v_Wl -- weight matrix of shape (layer_dims[l],layer_dims[l-1])
+        v_bl -- bias vector of shape (layer_dims[l],1)
+    """
     np.random.seed(1)
     velocities = {}
     L = len(layer_dims)
@@ -238,10 +246,9 @@ def updateParameters(parameters, grads, learning_rate):
 
 def updateParametersWithMomentum(parameters, grads, learningRate, velocities, momentum):
     """
-    Update parameters using gradient descent with momentum. 
-    The update of params is smoothed out by considering the past gradients . 
-    The exponential weighted average(of past gradients) is computed and used as gradient during the update
-    
+    Update parameters using gradient descent with momentum. The update of params is smoothed out by considering the past gradients. 
+    The momentum algorithm accumulates an exponentially decaying moving average of past gradients and continues to move in their direction.
+
     Arguments:
     parameters -- python dictionary containing the parameters 
     grads -- python dictionary containing the gradients, output of L_model_backward
@@ -260,13 +267,27 @@ def updateParametersWithMomentum(parameters, grads, learningRate, velocities, mo
     """
 
     L = len(parameters)//2
+
+    # Below update rules are compatible with both classical momentum as well as with Nesterov momentum
+    # For Nesterov momentum the "grads" are already computed at this stage using the so-called "interimParams". 
+    # The interimParams are computed in the main gradient descent loop, before starting the forward-backward iteration
+    
+    # Update rules for epoch "t"
+    # v(t) = m*v(t-1)-k*grads
+    # params(t) = params(t-1)+v(t)
+
+    # Goodfellow page 296, section 8.3.2
+    # https://dominikschmidt.xyz/nesterov-momentum/
+    # https://medium.com/konvergen/momentum-method-and-nesterov-accelerated-gradient-487ba776c987
     #First update the velocities    
     for l in range(L):
+        # Goodfellow eq. 8.15, pg. 296
         velocities["v_W"+str(l+1)] = momentum*velocities["v_W"+str(l+1)]-learningRate*grads["dW"+str(l+1)]
         velocities["v_b"+str(l+1)] = momentum*velocities["v_b"+str(l+1)]-learningRate*grads["db"+str(l+1)]
 
-    #Now apply the update rule
+    #Now apply the update rule for parameters
     for l in range(L):
+        #Goodfellow eq. 8.16 pg. 296
         parameters["W" + str(l+1)] = parameters["W" + str(l+1)]+velocities["v_W"+str(l+1)]
         parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["v_b"+str(l+1)]
 
