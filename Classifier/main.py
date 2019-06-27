@@ -42,19 +42,29 @@ n_h = 20 #size of the hidden layer
 n_y = 1
 layer_dims=(n_x,50,n_h,n_y)
 
+"""
+
+#No momentum :(
+model = Classifier.Model(layer_dims,initMode="xavier")
+model.train(train_data, train_labels,num_iterations=1000,learning_rate=0.0075,regularization_factor=0.2,print_cost=True)
+model.predict(test_data,test_labels)
+
+
+#Classical momentum
+model2 = Classifier.Model(layer_dims,initMode="xavier")
+model2.train2(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,print_cost=True)
+model2.predict(test_data,test_labels)
+
+
 #Nesterov momentum
 model3 = Classifier.Model(layer_dims,initMode="xavier")
 model3.train3(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,print_cost=True)
 model3.predict(test_data,test_labels)
 
-#Classical momentum
-model = Classifier.Model(layer_dims,initMode="xavier")
-model.train2(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,print_cost=True)
-model.predict(test_data,test_labels)
+"""
 
-#No momentum :(
-model2 = Classifier.Model(layer_dims,initMode="xavier")
-model2.train(train_data, train_labels,num_iterations=1000,learning_rate=0.0075,regularization_factor=0.2,print_cost=True)
-model2.predict(test_data,test_labels)
-
+#Adagrad
+model4 = Classifier.Model(layer_dims,initMode="xavier")
+model4.train4(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.075,regularization_factor=0.2,momentum=0.8,print_cost=True)
+model4.predict(test_data,test_labels)
 print("done")

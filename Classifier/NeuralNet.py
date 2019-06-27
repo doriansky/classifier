@@ -12,8 +12,6 @@ __author__= "Dorian Stoica"
 import numpy as np
 import ToolboxMath
 
-
-
 def initializeParameters(layer_dims,initMode):
     """
     Arguments:
@@ -57,7 +55,6 @@ def initializeVelocities(layer_dims):
         velocities['v_W'+str(l)] = np.zeros(shape=(layer_dims[l], layer_dims[l-1]))
         velocities['v_b'+str(l)] = np.zeros(shape=(layer_dims[l], 1))
     return velocities
-
 
 def computeLinearActivations(A,W,b):
     """
@@ -221,7 +218,6 @@ def backwardPropagation(AL,Y,caches, regularization_factor=0.0):
     
     return grads
 
-
 def updateParameters(parameters, grads, learning_rate):
     """
     Update parameters using gradient descent    
@@ -242,7 +238,6 @@ def updateParameters(parameters, grads, learning_rate):
         parameters["b" + str(l+1)] = parameters["b" + str(l+1)]-learning_rate*grads["db" + str(l+1)]
 
     return parameters
-
 
 def updateParametersWithMomentum(parameters, grads, learningRate, velocities, momentum):
     """
@@ -292,3 +287,24 @@ def updateParametersWithMomentum(parameters, grads, learningRate, velocities, mo
         parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["v_b"+str(l+1)]
 
     return velocities,parameters
+
+def updateParametersWithAdagrad(parameters, grads, learningRate,squaredGradientSum_w, squaredGradientSum_b):
+    """
+    Update parameters using gradient descent    
+    Arguments:
+    parameters -- python dictionary containing the parameters 
+    grads -- python dictionary containing the gradients, output of L_model_backward
+    accumulatedSquaredGradients -- python np.array containing the accumulated squared gradients for each layer
+    Returns:
+    parameters -- python dictionary containing the updated parameters 
+                  parameters["W" + str(l)] = ... 
+                  parameters["b" + str(l)] = ...
+    """
+    
+    L = len(parameters) // 2 # number of layers in the neural network
+    eps = 1e-8
+    for l in range(L):
+        parameters["W" + str(l+1)] = parameters["W" + str(l+1)]-(learningRate/(eps+np.sqrt(squaredGradientSum_w[l])))*grads["dW" + str(l+1)]
+        parameters["b" + str(l+1)] = parameters["b" + str(l+1)]-(learningRate/(eps+np.sqrt(squaredGradientSum_b[l])))*grads["db" + str(l+1)]
+
+    return parameters
