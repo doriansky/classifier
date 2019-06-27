@@ -288,9 +288,12 @@ def updateParametersWithMomentum(parameters, grads, learningRate, velocities, mo
 
     return velocities,parameters
 
-def updateParametersWithAdagrad(parameters, grads, learningRate,squaredGradientSum_w, squaredGradientSum_b):
+def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squaredGradientSum_w, squaredGradientSum_b):
     """
-    Update parameters using gradient descent    
+    Update parameters with adaptive learning rate :this method is compatible with both Adagrad and RMSProp
+    The only difference between Adagrad and RMS is the way in which the gradients are accumulated...but the actual
+    update rule is identical
+
     Arguments:
     parameters -- python dictionary containing the parameters 
     grads -- python dictionary containing the gradients, output of L_model_backward
