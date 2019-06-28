@@ -12,6 +12,26 @@ __author__= "Dorian Stoica"
 import numpy as np
 import ToolboxMath
 
+def initializeAccumulatedSquaredGradients(layer_dims):
+
+    """
+    Arguments:
+    layer_dims -- python array(list) containing the dimensions of each layer
+    init_mode -- string specifying the initialization mode : random or xavier
+    Returns:
+    parameters -- python dict containing the parameters "W1","b1",...."WL","bL":
+        Wl -- weight matrix of shape (layer_dims[l],layer_dims[l-1])
+        bl -- bias vector of shape (layer_dims[l],1)
+    """
+
+    acSqGradients = {}
+    L = len(layer_dims)    
+    for l in range(1,L):
+        acSqGradients['W'+str(l)] = np.zeros(shape=(layer_dims[l],layer_dims[l-1]))
+        acSqGradients['b'+str(l)] = np.zeros(shape=(layer_dims[l],1))
+
+    return acSqGradients     
+
 def initializeParameters(layer_dims,initMode):
     """
     Arguments:
@@ -28,7 +48,7 @@ def initializeParameters(layer_dims,initMode):
     L = len(layer_dims)
     if (initMode=="random"):
         for l in range(1,L):
-            parameters['W'+str(l)] = np.random.randn(layer_dims[l],layer_dims[l-1])*0.01
+            parameters['W'+str(l)] = np.random.randn(layer_dims[l],layer_dims[l-1])*0.1
             parameters['b'+str(l)] = np.zeros(shape=(layer_dims[l],1))
     elif (initMode=="xavier"):
         for l in range(1,L):
@@ -288,7 +308,7 @@ def updateParametersWithMomentum(parameters, grads, learningRate, velocities, mo
 
     return velocities,parameters
 
-def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squaredGradientSum_w, squaredGradientSum_b):
+def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squaredGradientSum):
     """
     Update parameters with adaptive learning rate :this method is compatible with both Adagrad and RMSProp
     The only difference between Adagrad and RMS is the way in which the gradients are accumulated...but the actual
@@ -307,7 +327,7 @@ def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squ
     L = len(parameters) // 2 # number of layers in the neural network
     eps = 1e-8
     for l in range(L):
-        parameters["W" + str(l+1)] = parameters["W" + str(l+1)]-(learningRate/(eps+np.sqrt(squaredGradientSum_w[l])))*grads["dW" + str(l+1)]
-        parameters["b" + str(l+1)] = parameters["b" + str(l+1)]-(learningRate/(eps+np.sqrt(squaredGradientSum_b[l])))*grads["db" + str(l+1)]
+        parameters["W"+str(l+1)] = parameters["W"+str(l+1)] - learningRate * np.divide(grads["dW"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["W"+str(l+1)])))
+        parameters["b"+str(l+1)] = parameters["b"+str(l+1)] - learningRate * np.divide(grads["db"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["b"+str(l+1)])))
 
     return parameters

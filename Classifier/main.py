@@ -18,6 +18,9 @@ For momentum, see Goodfellow pg 296
 5. Unit tests 
 
 DONE
+0. Figure out if AdaGrad and RMSProp are correctly implemented : in the update rule , np.sum of the current squared gradient is needed,
+otherwise parameters will explode (due to the division of grads (~e-3) with the sqrt of accum. squared gradients (~e-8) ....resulting in very big numbers)
+
 1. extend the Neural network; allow Xavier initialization of the parameters
 1a. during initialization , self.noLayers should be initialized as well
 
@@ -30,6 +33,8 @@ DONE
 import ToolboxImage
 import Classifier
 import numpy as np
+
+
 
 imgSize = 128
 path = "C:\\Users\\dorian.stoica\\Desktop\\house classifier\\training_data\\"
@@ -62,17 +67,17 @@ model3.train3(train_data, train_labels,num_iterations=1000,num_batches=1,learnin
 model3.predict(test_data,test_labels)
 
 
+"""
 #Adagrad
 model4 = Classifier.Model(layer_dims,initMode="xavier")
 model4.train4(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.75,regularization_factor=0.2,momentum=0.8,print_cost=True)
 model4.predict(test_data,test_labels)
 
-"""
 
 #RMSProp
 
 model6 = Classifier.Model(layer_dims,initMode="xavier")
-model6.train5(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,decayRate=0.1,print_cost=True)
+model6.train5(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,decayRate=0.9,print_cost=True)
 model6.predict(test_data,test_labels)
 
 print("done")

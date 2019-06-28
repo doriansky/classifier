@@ -20,8 +20,9 @@ class Model:
     def __init__(self,layer_dims,initMode):
         self.params = NeuralNet.initializeParameters(layer_dims,initMode)
         self.velocities = NeuralNet.initializeVelocities(layer_dims)
-        self.numberOfLayers = len(layer_dims)-1
-    
+        self.numberOfLayers = len(layer_dims)-1        
+        self.squaredGradients = NeuralNet.initializeAccumulatedSquaredGradients(layer_dims)
+
     #gradient descent with RMSProp
     def train5(self,X,Y,num_iterations,num_batches=1,learning_rate = 0.0075, regularization_factor=0.0,decayRate = 0.0, print_cost=False):
         """
@@ -47,10 +48,6 @@ class Model:
         assert (len(batched_data) == len(batched_labels))
         assert (len(batched_data)==num_batches)
       
-        #Init accumulated squared gradients
-        accumulatedSquaredGradients_w = np.array(np.zeros(shape=(self.numberOfLayers,1)))
-        accumulatedSquaredGradients_b = np.array(np.zeros(shape=(self.numberOfLayers,1)))
-
         # Gradient descent main loop
         for i in range(0,num_iterations):
                             
@@ -72,11 +69,11 @@ class Model:
                 #The only difference between RMSProp and Adagrad is the way in which we accumulate the gradients
                 #In RMSProp , gradient accumulation is changed into exponentially weighted moving average
                 for l in range(self.numberOfLayers):
-                    accumulatedSquaredGradients_w[l] = decayRate*accumulatedSquaredGradients_w[l] + (1-decayRate)*np.sum(np.square(grads["dW"+str(l+1)]))
-                    accumulatedSquaredGradients_b[l] = decayRate*accumulatedSquaredGradients_b[l] + (1-decayRate)*np.sum(np.square(grads["db"+str(l+1)]))
-
+                    self.squaredGradients["W"+str(l+1)] = decayRate*self.squaredGradients["W"+str(l+1)] + (1-decayRate)*np.square(grads["dW"+str(l+1)])
+                    self.squaredGradients["b"+str(l+1)] = decayRate*self.squaredGradients["b"+str(l+1)] + (1-decayRate)*np.square(grads["db"+str(l+1)])
+                             
                 # Update parameters                
-                parameters = NeuralNet.updateParametersWithAdaptiveLearningRate(parameters,grads,learning_rate,accumulatedSquaredGradients_w,accumulatedSquaredGradients_b)          
+                parameters = NeuralNet.updateParametersWithAdaptiveLearningRate(parameters,grads,learning_rate,self.squaredGradients)          
 
             if (print_cost and i%100==0):
                 print("Cost after iteration %i: %f" %(i,cost))
@@ -114,10 +111,6 @@ class Model:
         assert (len(batched_data) == len(batched_labels))
         assert (len(batched_data)==num_batches)
       
-        #Init accumulated squared gradients
-        accumulatedSquaredGradients_w = np.array(np.zeros(shape=(self.numberOfLayers,1)))
-        accumulatedSquaredGradients_b = np.array(np.zeros(shape=(self.numberOfLayers,1)))
-
         # Gradient descent main loop
         for i in range(0,num_iterations):
                             
@@ -136,14 +129,14 @@ class Model:
                 # Backward propagation
                 grads = NeuralNet.backwardPropagation(AL,currLabels,caches,regularization_factor)
 
-                #The key step of Adagrad : accumulate the sum of squared gradients
+                #The key step of Adagrad : accumulate the squared gradients
                 for l in range(self.numberOfLayers):
-                    accumulatedSquaredGradients_w[l] = accumulatedSquaredGradients_w[l] + np.sum(np.square(grads["dW"+str(l+1)]))
-                    accumulatedSquaredGradients_b[l] = accumulatedSquaredGradients_b[l] + np.sum(np.square(grads["db"+str(l+1)]))
-
-                # Update parameters                
-                parameters = NeuralNet.updateParametersWithAdaptiveLearningRate(parameters,grads,learning_rate,accumulatedSquaredGradients_w,accumulatedSquaredGradients_b)          
-
+                    self.squaredGradients["W"+str(l+1)] = self.squaredGradients["W"+str(l+1)] + np.square(grads["dW"+str(l+1)])
+                    self.squaredGradients["b"+str(l+1)] = self.squaredGradients["b"+str(l+1)] + np.square(grads["db"+str(l+1)])
+                
+                # Update parameters                                
+                parameters = NeuralNet.updateParametersWithAdaptiveLearningRate(parameters,grads,learning_rate,self.squaredGradients)          
+                 
             if (print_cost and i%100==0):
                 print("Cost after iteration %i: %f" %(i,cost))
                 costs.append(cost)
