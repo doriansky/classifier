@@ -332,6 +332,7 @@ def updateParametersWithMomentum(parameters, grads, learningRate, velocities, mo
 
     return velocities,parameters
 
+#Works with RMS and Adagrad
 def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squaredGradientSum):
     """
     Update parameters with adaptive learning rate :this method is compatible with both Adagrad and RMSProp
@@ -356,14 +357,15 @@ def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squ
 
     return parameters
 
-def updateParametersWithAdaptiveLearningRateAndMomentum(parameters, grads, learningRate, velocities, momentum, squaredGradientSum):
+#Works with RMS Nesterov
+def updateParametersWithAdaptiveLearningRateAndMomentum(parameters, grads, learningRate, velocities, momentum, squaredGradients):
     L = len(parameters) // 2 # number of layers in the neural network
     eps = 1e-8
 
     for l in range(L):
         # Goodfellow , pg. 310, RMSProp with momentum
-        velocities["W"+str(l+1)] = momentum*velocities["W"+str(l+1)]-learningRate*np.divide(grads["dW"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["W"+str(l+1)])))
-        velocities["b"+str(l+1)] = momentum*velocities["b"+str(l+1)]-learningRate*np.divide(grads["db"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["b"+str(l+1)])))
+        velocities["W"+str(l+1)] = momentum*velocities["W"+str(l+1)]-learningRate*np.divide(grads["dW"+str(l+1)],eps+np.sqrt(np.sum(squaredGradients["W"+str(l+1)])))
+        velocities["b"+str(l+1)] = momentum*velocities["b"+str(l+1)]-learningRate*np.divide(grads["db"+str(l+1)],eps+np.sqrt(np.sum(squaredGradients["b"+str(l+1)])))
 
     #Now apply the update rule for parameters
     for l in range(L):
@@ -373,3 +375,12 @@ def updateParametersWithAdaptiveLearningRateAndMomentum(parameters, grads, learn
 
     return velocities, parameters
 
+#Works with Adam
+def updateParametersWithAdaptiveMoments(parameters, grads,learningRate,velocities, squaredGradients):
+    L = len(parameters) // 2 # number of layers in the neural network
+    eps = 1e-8
+    for l in range(L):
+        parameters["W"+str(l+1)] = parameters["W"+str(l+1)] - learningRate * velocities["W"+str(l+1)]/np.sqrt(np.sum(squaredGradients["W"+str(l+1)]))
+        parameters["b"+str(l+1)] = parameters["b"+str(l+1)] - learningRate * velocities["b"+str(l+1)]/np.sqrt(np.sum(squaredGradients["b"+str(l+1)]))
+
+    return parameters

@@ -66,9 +66,8 @@ model3.predict(test_data,test_labels)
 
 #Adagrad
 model4 = Classifier.Model(layer_dims,initMode="xavier")
-model4.train4(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.75,regularization_factor=0.2,momentum=0.8,print_cost=True)
+model4.train4(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.75,regularization_factor=0.2,print_cost=True)
 model4.predict(test_data,test_labels)
-"""
 
 #RMSProp
 model5 = Classifier.Model(layer_dims,initMode="xavier")
@@ -79,5 +78,10 @@ model5.predict(test_data,test_labels)
 model6 = Classifier.Model(layer_dims,initMode="xavier")
 model6.train6(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,decayRate=0.9,print_cost=True)
 model6.predict(test_data,test_labels)
+"""
 
 
+#Adam
+model7 = Classifier.Model(layer_dims,initMode="xavier")
+model7.train7(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.1,secondDecayRate=0.001,print_cost=True)
+model7.predict(test_data,test_labels)
