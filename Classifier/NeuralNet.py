@@ -12,6 +12,30 @@ __author__= "Dorian Stoica"
 import numpy as np
 import ToolboxMath
 
+def initializeMomentEstimates(layer_dims):
+
+    """
+    Arguments:
+    layer_dims -- python array(list) containing the dimensions of each layer
+    init_mode -- string specifying the initialization mode : random or xavier
+    Returns:
+    parameters -- python dict containing the parameters "W1","b1",...."WL","bL":
+        Wl -- weight matrix of shape (layer_dims[l],layer_dims[l-1])
+        bl -- bias vector of shape (layer_dims[l],1)
+    """
+
+    firstMomentEstimates = {}
+    secondMomentEstimates = {}
+    L = len(layer_dims)    
+    for l in range(1,L):
+        firstMomentEstimates['W'+str(l)] = np.zeros(shape=(layer_dims[l],layer_dims[l-1]))
+        firstMomentEstimates['b'+str(l)] = np.zeros(shape=(layer_dims[l],1))
+        secondMomentEstimates['W'+str(l)] = np.zeros(shape=(layer_dims[l],layer_dims[l-1]))
+        secondMomentEstimates['b'+str(l)] = np.zeros(shape=(layer_dims[l],1))
+
+    return firstMomentEstimates, secondMomentEstimates
+
+
 def initializeAccumulatedSquaredGradients(layer_dims):
 
     """
@@ -48,7 +72,7 @@ def initializeParameters(layer_dims,initMode):
     L = len(layer_dims)
     if (initMode=="random"):
         for l in range(1,L):
-            parameters['W'+str(l)] = np.random.randn(layer_dims[l],layer_dims[l-1])*0.1
+            parameters['W'+str(l)] = np.random.randn(layer_dims[l],layer_dims[l-1])*0.01
             parameters['b'+str(l)] = np.zeros(shape=(layer_dims[l],1))
     elif (initMode=="xavier"):
         for l in range(1,L):
@@ -72,8 +96,8 @@ def initializeVelocities(layer_dims):
     velocities = {}
     L = len(layer_dims)
     for l in range(1,L):
-        velocities['v_W'+str(l)] = np.zeros(shape=(layer_dims[l], layer_dims[l-1]))
-        velocities['v_b'+str(l)] = np.zeros(shape=(layer_dims[l], 1))
+        velocities['W'+str(l)] = np.zeros(shape=(layer_dims[l], layer_dims[l-1]))
+        velocities['b'+str(l)] = np.zeros(shape=(layer_dims[l], 1))
     return velocities
 
 def computeLinearActivations(A,W,b):
@@ -297,14 +321,14 @@ def updateParametersWithMomentum(parameters, grads, learningRate, velocities, mo
     #First update the velocities    
     for l in range(L):
         # Goodfellow eq. 8.15, pg. 296
-        velocities["v_W"+str(l+1)] = momentum*velocities["v_W"+str(l+1)]-learningRate*grads["dW"+str(l+1)]
-        velocities["v_b"+str(l+1)] = momentum*velocities["v_b"+str(l+1)]-learningRate*grads["db"+str(l+1)]
+        velocities["W"+str(l+1)] = momentum*velocities["W"+str(l+1)]-learningRate*grads["dW"+str(l+1)]
+        velocities["b"+str(l+1)] = momentum*velocities["b"+str(l+1)]-learningRate*grads["db"+str(l+1)]
 
     #Now apply the update rule for parameters
     for l in range(L):
         #Goodfellow eq. 8.16 pg. 296
-        parameters["W" + str(l+1)] = parameters["W" + str(l+1)]+velocities["v_W"+str(l+1)]
-        parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["v_b"+str(l+1)]
+        parameters["W" + str(l+1)] = parameters["W" + str(l+1)]+velocities["W"+str(l+1)]
+        parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["b"+str(l+1)]
 
     return velocities,parameters
 
@@ -331,3 +355,21 @@ def updateParametersWithAdaptiveLearningRate(parameters, grads, learningRate,squ
         parameters["b"+str(l+1)] = parameters["b"+str(l+1)] - learningRate * np.divide(grads["db"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["b"+str(l+1)])))
 
     return parameters
+
+def updateParametersWithAdaptiveLearningRateAndMomentum(parameters, grads, learningRate, velocities, momentum, squaredGradientSum):
+    L = len(parameters) // 2 # number of layers in the neural network
+    eps = 1e-8
+
+    for l in range(L):
+        # Goodfellow , pg. 310, RMSProp with momentum
+        velocities["W"+str(l+1)] = momentum*velocities["W"+str(l+1)]-learningRate*np.divide(grads["dW"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["W"+str(l+1)])))
+        velocities["b"+str(l+1)] = momentum*velocities["b"+str(l+1)]-learningRate*np.divide(grads["db"+str(l+1)],eps+np.sqrt(np.sum(squaredGradientSum["b"+str(l+1)])))
+
+    #Now apply the update rule for parameters
+    for l in range(L):
+        #Goodfellow eq. 8.16 pg. 296
+        parameters["W" + str(l+1)] = parameters["W" + str(l+1)]+velocities["W"+str(l+1)]
+        parameters["b" + str(l+1)] = parameters["b" + str(l+1)]+velocities["b"+str(l+1)]
+
+    return velocities, parameters
+
