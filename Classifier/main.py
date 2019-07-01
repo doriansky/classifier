@@ -12,7 +12,17 @@ TODO list:
 3. Properly document "train" : use mini-batch gradient descent with default num-batches=1 (aka batch gradient descent)
     3a. decay the learning rate during mini-BGD : see Goodfellow page 295 eq. 8.14
 
-4. Extend the optimization options: Momentum, NesterovMomentum, AdaGrad,Adadelta, RMSprop, Adam, Adamax, Nadam, AMSGrad
+4. Extend the optimization options: 
+    1 vanilla sgf
+    2 Momentum 
+    3 NesterovMomentum
+    4 AdaGrad
+    5 RMSprop, 
+    6 RMS Prop with Nesterov
+    7 Adam
+    8 Adamax
+    9 Nadam
+    10 AMSGrad
 For momentum, see Goodfellow pg 296
 
 5. Unit tests 
@@ -78,10 +88,15 @@ model5.predict(test_data,test_labels)
 model6 = Classifier.Model(layer_dims,initMode="xavier")
 model6.train6(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,decayRate=0.9,print_cost=True)
 model6.predict(test_data,test_labels)
-"""
 
 
 #Adam
 model7 = Classifier.Model(layer_dims,initMode="xavier")
-model7.train7(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.1,secondDecayRate=0.001,print_cost=True)
+model7.train7(train_data, train_labels,num_iterations=3000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.9,secondDecayRate=0.901,print_cost=True)
 model7.predict(test_data,test_labels)
+"""
+
+#Adamax
+model8 = Classifier.Model(layer_dims,initMode="xavier")
+model8.train8(train_data, train_labels,num_iterations=3000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.9,secondDecayRate=0.901,print_cost=True)
+model8.predict(test_data,test_labels)

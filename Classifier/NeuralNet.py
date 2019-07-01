@@ -384,3 +384,12 @@ def updateParametersWithAdaptiveMoments(parameters, grads,learningRate,velocitie
         parameters["b"+str(l+1)] = parameters["b"+str(l+1)] - learningRate * velocities["b"+str(l+1)]/np.sqrt(np.sum(squaredGradients["b"+str(l+1)]))
 
     return parameters
+
+def updateParametersWithAdamax(parameters, grads,learningRate,velocities, squaredGradients):
+    L = len(parameters) // 2 # number of layers in the neural network
+    eps = 1e-8
+    for l in range(L):
+        parameters["W"+str(l+1)] = parameters["W"+str(l+1)] - learningRate * velocities["W"+str(l+1)]/squaredGradients["W"+str(l+1)]
+        parameters["b"+str(l+1)] = parameters["b"+str(l+1)] - learningRate * velocities["b"+str(l+1)]/squaredGradients["b"+str(l+1)]
+
+    return parameters
