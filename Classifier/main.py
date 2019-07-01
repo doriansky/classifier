@@ -88,15 +88,28 @@ model5.predict(test_data,test_labels)
 model6 = Classifier.Model(layer_dims,initMode="xavier")
 model6.train6(train_data, train_labels,num_iterations=1000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,momentum=0.8,decayRate=0.9,print_cost=True)
 model6.predict(test_data,test_labels)
+"""
 
 
 #Adam
 model7 = Classifier.Model(layer_dims,initMode="xavier")
 model7.train7(train_data, train_labels,num_iterations=3000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.9,secondDecayRate=0.901,print_cost=True)
 model7.predict(test_data,test_labels)
-"""
+
 
 #Adamax
 model8 = Classifier.Model(layer_dims,initMode="xavier")
 model8.train8(train_data, train_labels,num_iterations=3000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.9,secondDecayRate=0.901,print_cost=True)
 model8.predict(test_data,test_labels)
+
+
+
+#Nadam
+model9 = Classifier.Model(layer_dims,initMode="xavier")
+model9.train9(train_data, train_labels,num_iterations=3000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.9,secondDecayRate=0.901,print_cost=True)
+model9.predict(test_data,test_labels)
+
+#AMSGrad
+model10 = Classifier.Model(layer_dims,initMode="xavier")
+model10.train10(train_data, train_labels,num_iterations=3000,num_batches=1,learning_rate=0.0075,regularization_factor=0.2,firstDecayRate=0.9,secondDecayRate=0.901,print_cost=True)
+model10.predict(test_data,test_labels)
